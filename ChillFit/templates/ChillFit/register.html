@@ -2,102 +2,79 @@
 {% load static %}
 {% load form_filters %}
 
-
 {% block title %}Registro{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-success text-white text-center">
-                    <h3 class="mb-0">Registro de nuevo usuario</h3>
+<div class="container mt-4 d-flex justify-content-center">
+    <div class="col-md-6 col-lg-5 shadow p-3 rounded bg-light mb-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="card-body">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    
-                    <form method="POST" novalidate>
-                        {% csrf_token %}
-                        
-                        <fieldset class="mb-4">
-                            <legend class="h5">Datos de Usuario</legend>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ user_form.email.label_tag }}
-                                        {{ user_form.email|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ user_form.username.label_tag }}
-                                        {{ user_form.username|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ user_form.password1.label_tag }}
-                                        {{ user_form.password1|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ user_form.password2.label_tag }}
-                                        {{ user_form.password2|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <fieldset class="mb-4">
-                            <legend class="h5">Perfil</legend>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ profile_form.telefono.label_tag }}
-                                        {{ profile_form.telefono|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ profile_form.edad.label_tag }}
-                                        {{ profile_form.edad|add_class:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ profile_form.sexo.label_tag }}
-                                        {{ profile_form.sexo|add_class:"form-select" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        {{ profile_form.plan_de_trabajo.label_tag }}
-                                        {{ profile_form.plan_de_trabajo|add_class:"form-select" }}
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">Registrarme</button>
-                        </div>
-                    </form>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <!-- Email y Usuario -->
+            <div class="mb-2">
+                {{ user_form.email.label_tag }}
+                {{ user_form.email|add_class:"form-control" }}
+            </div>
+            <div class="mb-2">
+                {{ user_form.username.label_tag }}
+                {{ user_form.username|add_class:"form-control" }}
+            </div>
+
+            <!-- Passwords -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    {{ user_form.password1.label_tag }}
+                    {{ user_form.password1|add_class:"form-control" }}
                 </div>
-                <div class="card-footer text-center">
-                    <p class="mb-0">
-                        ¿Ya tienes cuenta? 
-                        <a href="{% url 'login' %}" class="text-success fw-bold">Inicia sesión aquí</a>.
-                    </p>
+                <div class="col-6 mb-2">
+                    {{ user_form.password2.label_tag }}
+                    {{ user_form.password2|add_class:"form-control" }}
                 </div>
             </div>
+
+            <!-- Teléfono y Edad -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    {{ profile_form.telefono.label_tag }}
+                    {{ profile_form.telefono|add_class:"form-control" }}
+                </div>
+                <div class="col-6 mb-2">
+                    {{ profile_form.edad.label_tag }}
+                    {{ profile_form.edad|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <!-- Sexo y Plan -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    {{ profile_form.sexo.label_tag }}
+                    {{ profile_form.sexo|add_class:"form-select" }}
+                </div>
+                <div class="col-6 mb-2">
+                    {{ profile_form.plan_de_trabajo.label_tag }}
+                    {{ profile_form.plan_de_trabajo|add_class:"form-select" }}
+                </div>
+            </div>
+
+            <!-- Botón -->
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success btn-sm w-100">Registrarme</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <p class="mb-0">¿Ya tienes cuenta?
+                <a href="{% url 'login' %}" class="text-success fw-bold">Inicia sesión aquí</a>.
+            </p>
         </div>
     </div>
 </div>

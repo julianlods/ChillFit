@@ -1,0 +1,41 @@
+{% extends 'ChillFit/base.html' %}
+
+{% block content %}
+<div class="container mt-3 text-center"> <!-- Centrar contenido -->
+    {% if rutinas %}
+        <div class="row justify-content-center"> <!-- Centrar las tarjetas -->
+            {% for rutina in rutinas %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100 
+                        {% if rutina.realizada %} bg-light {% else %} border-warning {% endif %}">
+                        <div class="card-header 
+                            {% if rutina.realizada %} bg-success text-white {% else %} bg-danger text-white {% endif %}">
+                            <h5 class="mb-0">{{ rutina.nombre }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">
+                                <strong>Estado:</strong> 
+                                {% if rutina.realizada %}
+                                    Realizada
+                                {% else %}
+                                    No Realizada
+                                {% endif %}
+                            </p>
+                            <p class="mb-0"><strong>Bloques:</strong> {{ rutina.bloques.count }}</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'ver_rutina_detalle' rutina.id %}" class="btn btn-outline-dark w-100">
+                                Ver Detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <strong>No tienes rutinas asignadas.</strong> ¡Solicita una al administrador!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

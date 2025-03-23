@@ -1,0 +1,79 @@
+{% extends 'ChillFit/base.html' %}
+
+{% block content %}
+<div class="container mt-3 text-center"> <!-- Centrar contenido -->
+
+    <div class="card shadow-sm p-3 mb-4"> <!-- Caja con sombra y padding -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <h4 class="mb-2 mb-md-0">
+                <strong>Estado de Rutina {{ rutina.id }}:</strong> 
+                {% if usuario_rutina.realizada %}
+                    <span class="badge bg-success px-3 py-2">Realizada</span>
+                {% else %}
+                    <span class="badge bg-danger px-3 py-2">No Realizada</span>
+                {% endif %}
+            </h4>
+
+            <form method="POST" class="d-flex align-items-center">
+                {% csrf_token %}
+                
+                {% if usuario_rutina.realizada %}
+                    <input type="hidden" name="desmarcar" value="true">
+                    <button type="submit" class="btn btn-warning btn-sm ms-2 px-4 py-2">
+                        ❌ Desmarcar como Realizada
+                    </button>
+                {% else %}
+                    <div class="input-group">
+                        <input 
+                            type="date" 
+                            id="fecha" 
+                            name="fecha" 
+                            class="form-control form-control-sm"
+                            value="{{ usuario_rutina.fecha_realizacion|date:'Y-m-d'|default:fecha_hoy|date:'Y-m-d' }}"
+                        >
+                        <button type="submit" class="btn btn-success btn-sm px-4 py-2">
+                            ✅ Marcar como Realizada
+                        </button>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="row justify-content-center"> <!-- Centrar las tarjetas -->
+        {% for bloque in rutina.bloques %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">{{ bloque.nombre }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if bloque.descripcion %}
+                            <p class="text-muted"><em>{{ bloque.descripcion }}</em></p>
+                        {% endif %}
+                        <p><strong>Método de trabajo:</strong> {{ bloque.metodo_de_trabajo }}</p>
+                        <h5>Ejercicios:</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for ejercicio in bloque.ejercicios %}
+                                <li class="list-group-item">
+                                    <strong>{{ ejercicio.descripcion }}</strong>
+
+                                    {% if ejercicio.video_id %}
+                                        <br>
+                                        <div class="ratio ratio-16x9 mt-2">
+                                            <iframe src="https://www.youtube.com/embed/{{ ejercicio.video_id }}" 
+                                                    title="Video de ejercicio" 
+                                                    allowfullscreen>
+                                            </iframe>
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

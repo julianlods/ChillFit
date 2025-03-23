@@ -1,0 +1,11 @@
+{% extends 'ChillFit/base.html' %}
+
+{% block title %}Pago Fallido - ChillFit{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h2 class="text-danger">¡Pago Fallido! ❌</h2>
+    <p class="lead">Hubo un problema con tu pago. Inténtalo de nuevo o verifica tu método de pago.</p>
+    <a href="{% url 'generar_pago' %}" class="btn btn-warning mt-3">Intentar de Nuevo</a>
+</div>
+{% endblock %}

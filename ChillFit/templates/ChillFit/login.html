@@ -1,0 +1,66 @@
+{% extends 'ChillFit/base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<!-- Contenedor con margen vertical moderado -->
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <!-- Ajusta las columnas según tus preferencias -->
+        <div class="col-11 col-sm-8 col-md-6 col-lg-5">
+            <!-- Tarjeta con sombra -->
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <!-- Título -->
+                    <h2 class="text-center mb-4">Iniciar Sesión</h2>
+                    <hr class="mb-4">
+
+                    <!-- Mensajes de error/éxito -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Formulario de login -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuario o Correo Electrónico</label>
+                            <input 
+                                type="text" 
+                                name="username" 
+                                class="form-control" 
+                                id="username" 
+                                placeholder="Ingresa tu usuario o correo"
+                                required
+                            >
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input 
+                                type="password" 
+                                name="password" 
+                                class="form-control" 
+                                id="password" 
+                                placeholder="Ingresa tu contraseña"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Acceder</button>
+                    </form>
+
+                    <!-- Link a registro -->
+                    <p class="text-center mt-3 mb-0">
+                        ¿No tenés cuenta? <a href="{% url 'register' %}">Regístrate aquí</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

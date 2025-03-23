@@ -1,0 +1,11 @@
+{% extends 'ChillFit/base.html' %}
+
+{% block title %}Pago Exitoso - ChillFit{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h2 class="text-success">¡Pago Exitoso! 🎉</h2>
+    <p class="lead">Tu pago ha sido procesado correctamente. Ya puedes disfrutar de tu plan de entrenamiento.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary mt-3">Volver al Inicio</a>
+</div>
+{% endblock %}

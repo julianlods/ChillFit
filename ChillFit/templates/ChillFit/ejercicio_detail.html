@@ -1,0 +1,15 @@
+{% extends 'ChillFit/base.html' %}
+
+{% block title %}Detalle del Ejercicio{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>{{ ejercicio.descripcion }}</h2>
+
+        {% if ejercicio.video_url %}
+            <iframe width="600" height="400" src="{{ ejercicio.video_url }}" frameborder="0" allowfullscreen></iframe>
+        {% else %}
+            <p>No hay video disponible para este ejercicio.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'ChillFit/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- Tarjetas informativas -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Mis Rutinas</h5>
+                    <p class="card-text">Mantenete al día con tus entrenamientos.</p>
+                    <a href="{% url 'ver_rutinas' %}" class="btn btn-primary">Ver Rutinas</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Contactá a tu entrenadora</h5>
+                    <p class="card-text">¿Preguntas/comentarios? No dudes en contactarme.</p>
+                    <a href="{% url 'contacto' %}" class="btn btn-success">Ir a Contacto</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Mi Perfil</h5>
+                    <p class="card-text">Accede a tu perfil para gestionar tus datos.</p>
+                    <a href="{% url 'perfil' %}" class="btn btn-warning">Ir a Mi Perfil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

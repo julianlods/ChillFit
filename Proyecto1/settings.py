@@ -5,9 +5,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuración de seguridad
-SECRET_KEY = 'django-insecure-...'
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = os.getenv("SECRET_KEY", "insegura")
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", ".onrender.com").split(",")
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -112,9 +112,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'ChillFit', 'static')]
+
+
 # **Configuración de MercadoPago**
 # Credenciales de MercadoPago
-MERCADOPAGO_PUBLIC_KEY = "TEST-1b836d74-15b0-459d-aeb5-b5aba3beec2d"
-MERCADOPAGO_ACCESS_TOKEN = "TEST-3666286772975422-032019-8fbe3321bf183c57c2935fa546d4237d-281041896"
-
-
+MERCADOPAGO_PUBLIC_KEY = os.getenv("MERCADOPAGO_PUBLIC_KEY", "")
+MERCADOPAGO_ACCESS_TOKEN = os.getenv("MERCADOPAGO_ACCESS_TOKEN", "")

@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container mt-4 d-flex justify-content-center">
     <div class="col-md-6 col-lg-5 shadow p-3 rounded bg-light mb-4">
-        
+
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         {% if messages %}
@@ -27,11 +27,13 @@
 
             <!-- Email -->
             <div class="mb-2">
+                <label for="id_email">Email</label>
                 <input type="email" class="form-control" id="id_email" value="{{ user.email }}" disabled placeholder="Email">
             </div>
-            
+
             <!-- Nombre de Usuario -->
             <div class="mb-2">
+                <label for="id_username">Nombre de Usuario</label>
                 <input type="text" class="form-control" name="username" id="id_username" value="{{ user.username }}" placeholder="Nombre de Usuario">
             </div>
 
@@ -39,11 +41,13 @@
             <div class="row">
                 <div class="col-6">
                     <div class="mb-2">
+                        <label for="id_telefono">Teléfono</label>
                         <input type="text" class="form-control" name="telefono" id="id_telefono" value="{{ perfil.telefono }}" placeholder="Teléfono">
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="mb-2">
+                        <label for="id_edad">Edad</label>
                         <input type="number" class="form-control" name="edad" id="id_edad" value="{{ perfil.edad }}" placeholder="Edad">
                     </div>
                 </div>
@@ -53,7 +57,9 @@
             <div class="row">
                 <div class="col-6">
                     <div class="mb-2">
+                        <label for="id_sexo">Sexo</label>
                         <select class="form-select" name="sexo" id="id_sexo">
+                            <option value="">---------</option>
                             <option value="M" {% if perfil.sexo == "M" %}selected{% endif %}>Masculino</option>
                             <option value="F" {% if perfil.sexo == "F" %}selected{% endif %}>Femenino</option>
                             <option value="O" {% if perfil.sexo == "O" %}selected{% endif %}>Otro</option>
@@ -62,9 +68,12 @@
                 </div>
                 <div class="col-6">
                     <div class="mb-2">
+                        <label for="id_plan">Plan de Trabajo</label>
                         <select class="form-select" name="plan" id="id_plan">
+                            <option value="">---------</option>
                             {% for plan in planes %}
-                                <option value="{{ plan.id }}" {% if perfil.plan_de_trabajo.id == plan.id %}selected{% endif %}>
+                                <option value="{{ plan.id }}"
+                                    {% if perfil.plan_de_trabajo and perfil.plan_de_trabajo.id == plan.id %}selected{% endif %}>
                                     {{ plan.nombre }}
                                 </option>
                             {% endfor %}
@@ -75,6 +84,7 @@
 
             <!-- Avatar -->
             <div class="mb-2">
+                <label for="id_avatar">Avatar</label>
                 <input type="file" class="form-control" name="avatar" id="id_avatar">
                 {% if perfil.avatar %}
                     <div class="mt-2 text-center">
@@ -91,4 +101,5 @@
     </div>
 </div>
 {% endblock %}
+
 

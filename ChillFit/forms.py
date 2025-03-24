@@ -4,10 +4,13 @@ from .models import Usuario, PerfilUsuario, UsuarioRutina, Rutina
 
 
 class CustomUserCreationForm(UserCreationForm):
-    """
-    Formulario personalizado para crear un usuario.
-    Incluye los campos esenciales del modelo Usuario.
-    """
+    email = forms.EmailField(
+        label="Email",
+        error_messages={
+            'invalid': 'Introduzca una dirección válida de email'
+        }
+    )
+
     class Meta:
         model = Usuario
         fields = ('email', 'username', 'password1', 'password2')
@@ -19,7 +22,7 @@ class PerfilUsuarioForm(forms.ModelForm):
     """
     class Meta:
         model = PerfilUsuario
-        fields = ('telefono', 'edad', 'sexo', 'plan_de_trabajo')
+        fields = ('telefono', 'edad')
 
 
 class UsuarioRutinaForm(forms.ModelForm):

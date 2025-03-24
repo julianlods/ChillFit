@@ -1,7 +1,7 @@
 import re
 import mercadopago
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.timezone import now
@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import login
 
 
 @login_required
@@ -25,16 +26,31 @@ def home(request):
     })
 
 
+User = get_user_model()
+
 def login_view(request):
     """
     Vista para el inicio de sesión.
     Permite autenticar con username o email junto con la contraseña.
     """
     if request.method == 'POST':
-        username = request.POST.get('username')  # Puede ser email o username
+        identifier = request.POST.get('username')  # Puede ser username o email
         password = request.POST.get('password')
 
-        user = authenticate(request, username=username, password=password)
+        # Buscar por email o username
+        try:
+            user_obj = User.objects.get(email=identifier)
+        except User.DoesNotExist:
+            try:
+                user_obj = User.objects.get(username=identifier)
+            except User.DoesNotExist:
+                user_obj = None
+
+        if user_obj:
+            user = authenticate(request, username=user_obj.username, password=password)
+        else:
+            user = None
+
         if user is not None:
             login(request, user)
             return redirect('ver_rutinas')
@@ -45,9 +61,6 @@ def login_view(request):
 
 
 def register_view(request):
-    """
-    Vista para registrar un nuevo usuario con sus datos de perfil.
-    """
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
         profile_form = PerfilUsuarioForm(request.POST)
@@ -58,10 +71,16 @@ def register_view(request):
             profile.usuario = user
             profile.save()
 
-            messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
-            return redirect('login')
-        else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            # Dejamos solo la variable para SweetAlert
+            user_form = CustomUserCreationForm()
+            profile_form = PerfilUsuarioForm()
+
+            return render(request, 'ChillFit/register.html', {
+                'user_form': user_form,
+                'profile_form': profile_form,
+                'registro_exitoso': True  
+            })
+
     else:
         user_form = CustomUserCreationForm()
         profile_form = PerfilUsuarioForm()
@@ -203,7 +222,8 @@ def perfil(request):
     usuario = request.user
 
     # Obtener o crear el perfil del usuario
-    perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
+    perfil = get_object_or_404(PerfilUsuario, usuario=usuario)
+
 
     if request.method == 'POST':
         perfil.telefono = request.POST.get('telefono', perfil.telefono)

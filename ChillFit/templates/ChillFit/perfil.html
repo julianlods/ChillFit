@@ -25,16 +25,16 @@
         <form method="post" enctype="multipart/form-data" class="mt-2">
             {% csrf_token %}
 
-            <!-- Email -->
-            <div class="mb-2">
-                <label for="id_email">Email</label>
-                <input type="email" class="form-control" id="id_email" value="{{ user.email }}" disabled placeholder="Email">
-            </div>
-
-            <!-- Nombre de Usuario -->
-            <div class="mb-2">
-                <label for="id_username">Nombre de Usuario</label>
-                <input type="text" class="form-control" name="username" id="id_username" value="{{ user.username }}" placeholder="Nombre de Usuario">
+            <!-- Email y Nombre de Usuario en una misma fila -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label for="id_email">Email</label>
+                    <input type="email" class="form-control" id="id_email" value="{{ user.email }}" disabled placeholder="Email">
+                </div>
+                <div class="col-6 mb-2">
+                    <label for="id_username">Nombre de Usuario</label>
+                    <input type="text" class="form-control" name="username" id="id_username" value="{{ user.username }}" placeholder="Nombre de Usuario">
+                </div>
             </div>
 
             <!-- Cambio de contraseña -->

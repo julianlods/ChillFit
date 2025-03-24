@@ -37,6 +37,18 @@
                 <input type="text" class="form-control" name="username" id="id_username" value="{{ user.username }}" placeholder="Nombre de Usuario">
             </div>
 
+            <!-- Cambio de contraseña -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label for="id_password1">Nueva Contraseña</label>
+                    <input type="password" class="form-control" name="password1" id="id_password1" placeholder="Nueva contraseña">
+                </div>
+                <div class="col-6 mb-2">
+                    <label for="id_password2">Confirmar Nueva Contraseña</label>
+                    <input type="password" class="form-control" name="password2" id="id_password2" placeholder="Confirmar nueva contraseña">
+                </div>
+            </div>
+
             <!-- Teléfono y Edad -->
             <div class="row">
                 <div class="col-6">
@@ -86,11 +98,6 @@
             <div class="mb-2">
                 <label for="id_avatar">Avatar</label>
                 <input type="file" class="form-control" name="avatar" id="id_avatar">
-                {% if perfil.avatar %}
-                    <div class="mt-2 text-center">
-                        <img src="{{ perfil.avatar.url }}" alt="Avatar actual" class="img-thumbnail" width="80">
-                    </div>
-                {% endif %}
             </div>
 
             <!-- Botón -->

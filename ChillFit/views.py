@@ -224,20 +224,34 @@ def perfil(request):
     # Obtener o crear el perfil del usuario
     perfil = get_object_or_404(PerfilUsuario, usuario=usuario)
 
-
     if request.method == 'POST':
         perfil.telefono = request.POST.get('telefono', perfil.telefono)
         perfil.edad = request.POST.get('edad', perfil.edad)
         perfil.sexo = request.POST.get('sexo', perfil.sexo)
         if 'avatar' in request.FILES:
             perfil.avatar = request.FILES['avatar']
-        
+
         # Asignar el Plan de Trabajo seleccionado
         plan_id = request.POST.get('plan')
         if plan_id:
             perfil.plan_de_trabajo = PlanDeTrabajo.objects.get(id=plan_id)
-        
+
         perfil.save()
+
+        # CAMBIO DE CONTRASEÑA (si se completan los campos)
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 or password2:
+            if password1 == password2 and password1.strip():
+                usuario.set_password(password1)
+                usuario.save()
+                messages.success(request, 'Contraseña actualizada correctamente. Por favor, iniciá sesión de nuevo.')
+                return redirect('login')  # Se desloguea tras cambiar la contraseña
+            else:
+                messages.error(request, 'Las contraseñas no coinciden o son inválidas.')
+                return redirect('perfil')
+
         messages.success(request, 'Perfil actualizado correctamente.')
         return redirect('perfil')
 

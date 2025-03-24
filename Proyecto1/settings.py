@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuración de seguridad
 SECRET_KEY = os.getenv("SECRET_KEY", "insegura")
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com").split(",")
 
 # Aplicaciones instaladas

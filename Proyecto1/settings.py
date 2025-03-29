@@ -1,5 +1,5 @@
 from pathlib import Path
-import os
+from decouple import config
 
 # Rutas base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -119,7 +119,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'ChillFit', 'static')]
 
 # **Configuración de MercadoPago**
 # Credenciales de MercadoPago
-MERCADOPAGO_PUBLIC_KEY = os.getenv("MERCADOPAGO_PUBLIC_KEY", "")
-MERCADOPAGO_ACCESS_TOKEN = os.getenv("MERCADOPAGO_ACCESS_TOKEN", "")
+MERCADOPAGO_PUBLIC_KEY = config("MERCADOPAGO_PUBLIC_KEY")
+MERCADOPAGO_ACCESS_TOKEN = config("MERCADOPAGO_ACCESS_TOKEN")
+
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

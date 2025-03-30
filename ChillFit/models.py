@@ -88,7 +88,6 @@ class Bloque(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
     metodo_de_trabajo = models.ForeignKey(MetodoDeTrabajo, on_delete=models.CASCADE)
-    ejercicios = models.ManyToManyField(Ejercicio, blank=True)  # el que ya existía
     ejercicios_ordenados = models.ManyToManyField(Ejercicio, through='BloqueEjercicio', related_name='bloques_ordenados', blank=True)
 
 

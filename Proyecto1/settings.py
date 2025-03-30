@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 from decouple import config, Csv
 import dj_database_url
 
@@ -9,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuración de seguridad
 SECRET_KEY = os.getenv("SECRET_KEY", "insegura")
-DEBUG = "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com").split(",")
 
 # Aplicaciones instaladas

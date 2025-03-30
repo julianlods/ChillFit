@@ -5,7 +5,7 @@ from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.timezone import now
-from .models import UsuarioRutina, Rutina, PerfilUsuario, PlanDeTrabajo, Pago
+from .models import UsuarioRutina, Rutina, PerfilUsuario, PlanDeTrabajo, Pago, BloqueEjercicio
 from .forms import CustomUserCreationForm, PerfilUsuarioForm
 from django.utils.timezone import now
 from django.core.mail import send_mail

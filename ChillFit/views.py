@@ -396,14 +396,11 @@ def informar_transferencia(request):
 
 @csrf_exempt
 def webhook_mercadopago(request):
-    print("==== [WEBHOOK] Nueva solicitud recibida ====")
-    print("🌐 Full path:", request.get_full_path())
-
     try:
-        # Intenta leer como JSON (correcto)
+        # Intenta leer el body como JSON
         data = json.loads(request.body.decode('utf-8'))
     except json.JSONDecodeError:
-        # Fallback: intenta tomar los datos por GET (ej: /?type=payment&data.id=xxx)
+        # Si falla, usa los parámetros por GET como fallback
         data = {
             "type": request.GET.get("type"),
             "data": {
@@ -411,22 +408,15 @@ def webhook_mercadopago(request):
             }
         }
 
-    print("📦 Data procesada:", data)
-
     if data.get("type") == "payment" and data.get("data", {}).get("id"):
         payment_id = data["data"]["id"]
-        print("🔎 ID de pago recibido:", payment_id)
 
         try:
             sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
             payment_info = sdk.payment().get(payment_id)
-            print("📄 Info de pago:", payment_info)
 
             status = payment_info["response"].get("status", "")
             external_ref = payment_info["response"].get("external_reference")
-
-            print("📌 Estado del pago:", status)
-            print("🔗 External Reference:", external_ref)
 
             if status == "approved" and external_ref:
                 from .models import Pago
@@ -437,12 +427,9 @@ def webhook_mercadopago(request):
                     pago.id_pago_mercadopago = str(payment_id)
                     pago.metodo_pago = "mercadopago"
                     pago.save()
-                    print("✅ Pago actualizado con éxito:", pago.id)
                 except Pago.DoesNotExist:
-                    print(f"❌ No se encontró el pago con id={external_ref}")
-        except Exception as e:
-            print("🚨 Error al consultar MP:", e)
-    else:
-        print("❌ Tipo o datos inválidos en el webhook")
+                    pass
+        except Exception:
+            pass
 
     return HttpResponse(status=200)

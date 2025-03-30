@@ -153,13 +153,17 @@ def ver_rutina_detalle(request, rutina_id):
 
     for bloque in rutina.bloques.all():
         ejercicios_lista = []
-        for ejercicio in bloque.ejercicios.all():
+        bloque_ejercicios = BloqueEjercicio.objects.filter(bloque=bloque).order_by('orden')
+
+        for be in bloque_ejercicios:
+            ejercicio = be.ejercicio
             video_id = extraer_id_youtube(ejercicio.video) if ejercicio.video else None
             ejercicios_lista.append({
                 'descripcion': ejercicio.descripcion,
                 'video': ejercicio.video,
                 'video_id': video_id
             })
+
         bloques_lista.append({
             'nombre': bloque.nombre,
             'descripcion': bloque.descripcion,

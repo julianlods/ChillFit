@@ -1,18 +1,20 @@
 import re
+import json
 import mercadopago
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils.timezone import now
+from django.core.mail import send_mail
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils import timezone
+from django.conf import settings
+
 from .models import UsuarioRutina, Rutina, PerfilUsuario, PlanDeTrabajo, Pago, BloqueEjercicio
 from .forms import CustomUserCreationForm, PerfilUsuarioForm
-from django.utils.timezone import now
-from django.core.mail import send_mail
-from django.conf import settings
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth import login
 
 
 @login_required
@@ -291,6 +293,7 @@ def generar_pago(request):
                     "pending": request.build_absolute_uri('/pago_pendiente/')
                 },
                 "auto_return": "approved",
+                "external_reference": str(pago.id)
             }
 
             preference_response = sdk.preference().create(preference_data)
@@ -389,3 +392,37 @@ def informar_transferencia(request):
             return redirect("generar_pago")
 
         return render(request, "ChillFit/informar_transferencia.html", {"pago_id": pago_id})
+
+
+@csrf_exempt
+def webhook_mercadopago(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            if data.get("type") == "payment":
+                payment_id = data["data"]["id"]
+
+                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+                payment_info = sdk.payment().get(payment_id)
+
+                status = payment_info["response"].get("status", "")
+                external_ref = payment_info["response"].get("external_reference")
+
+                if status == "approved" and external_ref:
+                    from .models import Pago
+                    try:
+                        pago = Pago.objects.get(id=external_ref)
+                        pago.estado = "aprobado"
+                        pago.fecha_pago = timezone.now()
+                        pago.id_pago_mercadopago = str(payment_id)  # Guardás el ID real
+                        pago.metodo_pago = "mercadopago"
+                        pago.save()
+                    except Pago.DoesNotExist:
+                        print(f"No se encontró el pago con id={external_ref}")
+
+        except Exception as e:
+            print("Error en webhook:", e)
+
+    return HttpResponse(status=200)
+

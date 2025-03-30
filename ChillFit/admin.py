@@ -43,7 +43,7 @@ admin.site.register(Ejercicio, EjercicioAdmin)
 class BloqueEjercicioInline(admin.TabularInline):
     model = BloqueEjercicio
     form = BloqueEjercicioForm
-    extra = 5
+    extra = 0
     ordering = ['orden']
     autocomplete_fields = ['ejercicio']
 
@@ -103,7 +103,7 @@ class PagoForm(forms.ModelForm):
 class PagoForm(forms.ModelForm):
     class Meta:
         model = Pago
-        exclude = ['plan_de_trabajo']  # ❌ Lo ocultamos del admin
+        exclude = ['plan_de_trabajo'] 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

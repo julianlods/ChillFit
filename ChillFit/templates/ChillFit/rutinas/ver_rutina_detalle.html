@@ -54,14 +54,14 @@
                         <p><strong>Método de trabajo:</strong> {{ bloque.metodo_de_trabajo }}</p>
                         <h5>Ejercicios:</h5>
                         <ul class="list-group list-group-flush">
-                            {% for ejercicio in bloque.ejercicios %}
+                            {% for relacion in bloque.bloqueejercicio_set.all|dictsort:"orden" %}
                                 <li class="list-group-item">
-                                    <strong>{{ ejercicio.descripcion }}</strong>
+                                    <strong>{{ relacion.ejercicio.descripcion }}</strong>
 
-                                    {% if ejercicio.video_id %}
+                                    {% if relacion.ejercicio.video_id %}
                                         <br>
                                         <div class="ratio ratio-16x9 mt-2">
-                                            <iframe src="https://www.youtube.com/embed/{{ ejercicio.video_id }}" 
+                                            <iframe src="https://www.youtube.com/embed/{{ relacion.ejercicio.video_id }}" 
                                                     title="Video de ejercicio" 
                                                     allowfullscreen>
                                             </iframe>
@@ -77,3 +77,4 @@
     </div>
 </div>
 {% endblock %}
+

@@ -427,9 +427,21 @@ def webhook_mercadopago(request):
                     pago.id_pago_mercadopago = str(payment_id)
                     pago.metodo_pago = "mercadopago"
                     pago.save()
+
+                    # Enviar mail de confirmación
+                    if pago.usuario and pago.usuario.email:
+                        send_mail(
+                            subject="Confirmación de Pago - ChillFit 💪",
+                            message=f"Hola {pago.usuario.username}, tu pago fue recibido con éxito.",
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=[pago.usuario.email],
+                            fail_silently=True  # para evitar que el webhook se caiga si hay error de mail
+                        )
+
                 except Pago.DoesNotExist:
                     pass
         except Exception:
             pass
 
     return HttpResponse(status=200)
+

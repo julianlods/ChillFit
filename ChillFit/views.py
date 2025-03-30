@@ -164,12 +164,7 @@ def ver_rutina_detalle(request, rutina_id):
                 'video_id': video_id
             })
 
-        bloques_lista.append({
-            'nombre': bloque.nombre,
-            'descripcion': bloque.descripcion,
-            'metodo_de_trabajo': bloque.metodo_de_trabajo.descripcion,
-            'ejercicios': ejercicios_lista
-        })
+        bloques_lista.append(bloque)
 
     return render(request, 'ChillFit/rutinas/ver_rutina_detalle.html', {
         'rutina': {

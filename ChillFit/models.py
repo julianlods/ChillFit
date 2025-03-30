@@ -77,6 +77,15 @@ class Ejercicio(models.Model):
     def __str__(self):
         return self.descripcion
 
+    @property
+    def video_id(self):
+        if self.video and "youtube" in self.video:
+            return self.video.split("v=")[-1].split("&")[0]  # Maneja ?v=ID y otros params
+        elif "youtu.be/" in self.video:
+            return self.video.split("youtu.be/")[-1].split("?")[0]
+        return None
+
+
 class MetodoDeTrabajo(models.Model):
     descripcion = models.CharField(max_length=250)
 

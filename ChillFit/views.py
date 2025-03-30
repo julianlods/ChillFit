@@ -396,40 +396,53 @@ def informar_transferencia(request):
 
 @csrf_exempt
 def webhook_mercadopago(request):
-    if request.method == "POST":
-        print("==== [WEBHOOK] Nueva solicitud recibida ====")
+    print("==== [WEBHOOK] Nueva solicitud recibida ====")
+    print("🌐 Full path:", request.get_full_path())
+
+    try:
+        # Intenta leer como JSON (correcto)
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        # Fallback: intenta tomar los datos por GET (ej: /?type=payment&data.id=xxx)
+        data = {
+            "type": request.GET.get("type"),
+            "data": {
+                "id": request.GET.get("data.id")
+            }
+        }
+
+    print("📦 Data procesada:", data)
+
+    if data.get("type") == "payment" and data.get("data", {}).get("id"):
+        payment_id = data["data"]["id"]
+        print("🔎 ID de pago recibido:", payment_id)
+
         try:
-            data = json.loads(request.body)
-            print("📦 Body recibido:", data)
+            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+            payment_info = sdk.payment().get(payment_id)
+            print("📄 Info de pago:", payment_info)
 
-            if data.get("type") == "payment":
-                payment_id = data["data"]["id"]
-                print("🔎 ID de pago recibido:", payment_id)
+            status = payment_info["response"].get("status", "")
+            external_ref = payment_info["response"].get("external_reference")
 
-                sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
-                payment_info = sdk.payment().get(payment_id)
-                print("📄 Info de pago:", payment_info)
+            print("📌 Estado del pago:", status)
+            print("🔗 External Reference:", external_ref)
 
-                status = payment_info["response"].get("status", "")
-                external_ref = payment_info["response"].get("external_reference")
-
-                print("📌 Estado del pago:", status)
-                print("🔗 External Reference:", external_ref)
-
-                if status == "approved" and external_ref:
-                    from .models import Pago
-                    try:
-                        pago = Pago.objects.get(id=external_ref)
-                        pago.estado = "aprobado"
-                        pago.fecha_pago = timezone.now()
-                        pago.id_pago_mercadopago = str(payment_id)
-                        pago.metodo_pago = "mercadopago"
-                        pago.save()
-                        print("✅ Pago actualizado con éxito:", pago.id)
-                    except Pago.DoesNotExist:
-                        print(f"❌ No se encontró el pago con id={external_ref}")
-
+            if status == "approved" and external_ref:
+                from .models import Pago
+                try:
+                    pago = Pago.objects.get(id=external_ref)
+                    pago.estado = "aprobado"
+                    pago.fecha_pago = timezone.now()
+                    pago.id_pago_mercadopago = str(payment_id)
+                    pago.metodo_pago = "mercadopago"
+                    pago.save()
+                    print("✅ Pago actualizado con éxito:", pago.id)
+                except Pago.DoesNotExist:
+                    print(f"❌ No se encontró el pago con id={external_ref}")
         except Exception as e:
-            print("🚨 Error en webhook:", str(e))
+            print("🚨 Error al consultar MP:", e)
+    else:
+        print("❌ Tipo o datos inválidos en el webhook")
 
     return HttpResponse(status=200)

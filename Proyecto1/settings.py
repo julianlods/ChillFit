@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
+import dj_database_url
+
 
 # Rutas base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,12 +59,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Proyecto1.wsgi.application'
 
 # Configuración de la base de datos
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Detectar si estás en modo desarrollo
+DEBUG = config('DEBUG', default=True, cast=bool)
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': dj_database_url.config(default=config('DATABASE_URL'))
+    }
+
 
 # Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [

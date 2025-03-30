@@ -397,17 +397,24 @@ def informar_transferencia(request):
 @csrf_exempt
 def webhook_mercadopago(request):
     if request.method == "POST":
+        print("==== [WEBHOOK] Nueva solicitud recibida ====")
         try:
             data = json.loads(request.body)
+            print("📦 Body recibido:", data)
 
             if data.get("type") == "payment":
                 payment_id = data["data"]["id"]
+                print("🔎 ID de pago recibido:", payment_id)
 
                 sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
                 payment_info = sdk.payment().get(payment_id)
+                print("📄 Info de pago:", payment_info)
 
                 status = payment_info["response"].get("status", "")
                 external_ref = payment_info["response"].get("external_reference")
+
+                print("📌 Estado del pago:", status)
+                print("🔗 External Reference:", external_ref)
 
                 if status == "approved" and external_ref:
                     from .models import Pago
@@ -415,14 +422,14 @@ def webhook_mercadopago(request):
                         pago = Pago.objects.get(id=external_ref)
                         pago.estado = "aprobado"
                         pago.fecha_pago = timezone.now()
-                        pago.id_pago_mercadopago = str(payment_id)  # Guardás el ID real
+                        pago.id_pago_mercadopago = str(payment_id)
                         pago.metodo_pago = "mercadopago"
                         pago.save()
+                        print("✅ Pago actualizado con éxito:", pago.id)
                     except Pago.DoesNotExist:
-                        print(f"No se encontró el pago con id={external_ref}")
+                        print(f"❌ No se encontró el pago con id={external_ref}")
 
         except Exception as e:
-            print("Error en webhook:", e)
+            print("🚨 Error en webhook:", str(e))
 
     return HttpResponse(status=200)
-

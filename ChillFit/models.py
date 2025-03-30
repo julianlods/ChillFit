@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Group, Permission
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 import uuid
 
 
@@ -41,7 +42,8 @@ class PerfilUsuario(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil')
     telefono = models.CharField(max_length=20, blank=True, null=True)
     edad = models.PositiveIntegerField(blank=False, null=False, default=18)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = CloudinaryField('avatar', blank=True, null=True)
+
     sexo = models.CharField(
         max_length=10,
         choices=[('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')],

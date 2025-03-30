@@ -87,16 +87,28 @@ class MetodoDeTrabajo(models.Model):
 class Bloque(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
-    metodo_de_trabajo = models.ForeignKey(
-        MetodoDeTrabajo,
-        on_delete=models.CASCADE
-    )
-    ejercicios = models.ManyToManyField(Ejercicio, blank=True)
+    metodo_de_trabajo = models.ForeignKey(MetodoDeTrabajo, on_delete=models.CASCADE)
+    ejercicios = models.ManyToManyField(Ejercicio, blank=True)  # el que ya existía
+    ejercicios_ordenados = models.ManyToManyField(Ejercicio, through='BloqueEjercicio', related_name='bloques_ordenados', blank=True)
+
 
     def __str__(self):
         if self.descripcion:
             return f"{self.nombre} - {self.descripcion[:30]}"
-        return self.nombre  # Devuelve solo el nombre si no hay descripción
+        return self.nombre
+
+
+class BloqueEjercicio(models.Model):
+    bloque = models.ForeignKey('Bloque', on_delete=models.CASCADE)
+    ejercicio = models.ForeignKey('Ejercicio', on_delete=models.CASCADE)
+    orden = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('bloque', 'ejercicio')
+        ordering = ['orden']
+
+    def __str__(self):
+        return f"{self.bloque.nombre} - {self.ejercicio.descripcion} (orden {self.orden})"
 
 
 class Rutina(models.Model):

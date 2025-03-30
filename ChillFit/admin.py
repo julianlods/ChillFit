@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.utils import timezone
-from .models import Usuario, PerfilUsuario, PlanDeTrabajo, Ejercicio, Bloque, Rutina, MetodoDeTrabajo, UsuarioRutina, Pago
+from .models import Usuario, PerfilUsuario, PlanDeTrabajo, Ejercicio, Bloque, Rutina, MetodoDeTrabajo, UsuarioRutina, Pago, BloqueEjercicio
 from .forms import UsuarioRutinaForm
 from django.utils.html import format_html
 
@@ -40,13 +40,20 @@ class EjercicioAdmin(admin.ModelAdmin):
 
 admin.site.register(Ejercicio, EjercicioAdmin)
 
+
+class BloqueEjercicioInline(admin.TabularInline):
+    model = BloqueEjercicio
+    extra = 1
+    ordering = ['orden']
+
+
 # Configuración para el modelo Bloque
 class BloqueAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', 'metodo_de_trabajo')
     search_fields = ('nombre', 'descripcion')
     list_filter = ('metodo_de_trabajo',)
     ordering = ('nombre',)
-    filter_horizontal = ('ejercicios',)
+    inlines = [BloqueEjercicioInline]  
 
 admin.site.register(Bloque, BloqueAdmin)
 

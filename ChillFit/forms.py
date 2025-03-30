@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, PerfilUsuario, UsuarioRutina, Rutina
+from .models import Usuario, PerfilUsuario, UsuarioRutina, Rutina, BloqueEjercicio
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -40,3 +40,12 @@ class UsuarioRutinaForm(forms.ModelForm):
         self.fields['rutina'].label_from_instance = lambda obj: (
             f"{obj.nombre} - {obj.descripcion[:30]}..." if obj.descripcion else obj.nombre
         )
+
+
+class BloqueEjercicioForm(forms.ModelForm):
+    class Meta:
+        model = BloqueEjercicio
+        fields = '__all__'
+        widgets = {
+            'ejercicio': forms.Select(attrs={'class': 'vTextField', 'style': 'width: 300px'}),
+        }

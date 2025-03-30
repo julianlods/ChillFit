@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from .models import Usuario, PerfilUsuario, PlanDeTrabajo, Ejercicio, Bloque, Rutina, MetodoDeTrabajo, UsuarioRutina, Pago, BloqueEjercicio
-from .forms import UsuarioRutinaForm
+from .forms import UsuarioRutinaForm, BloqueEjercicioForm
 from django.utils.html import format_html
 
 
@@ -36,15 +36,16 @@ admin.site.register(PlanDeTrabajo, PlanDeTrabajoAdmin)
 class EjercicioAdmin(admin.ModelAdmin):
     list_display = ('descripcion', 'video')
     search_fields = ('descripcion',)
-    list_filter = ('video',)
 
 admin.site.register(Ejercicio, EjercicioAdmin)
 
 
 class BloqueEjercicioInline(admin.TabularInline):
     model = BloqueEjercicio
-    extra = 1
+    form = BloqueEjercicioForm
+    extra = 5
     ordering = ['orden']
+    autocomplete_fields = ['ejercicio']
 
 
 # Configuración para el modelo Bloque
@@ -53,7 +54,7 @@ class BloqueAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'descripcion')
     list_filter = ('metodo_de_trabajo',)
     ordering = ('nombre',)
-    inlines = [BloqueEjercicioInline]  
+    inlines = [BloqueEjercicioInline]  # ← ¡ACÁ LA MAGIA!
 
 admin.site.register(Bloque, BloqueAdmin)
 

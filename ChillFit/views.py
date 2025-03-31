@@ -380,7 +380,7 @@ def informar_transferencia(request):
         pago.id_pago_mercadopago = None     # ✅ limpiamos si se generó por error
         pago.save()
 
-        messages.success(request, "Tu comprobante fue enviado correctamente.")
+        messages.success(request, "Tu pago fue informado correctamente. Una vez verificada la transferencia, será aprobado.")
         return redirect("generar_pago")
 
     else:

@@ -165,7 +165,12 @@ class Pago(models.Model):
     fecha_generacion = models.DateTimeField(auto_now_add=True)
     fecha_pago = models.DateTimeField(null=True, blank=True)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
-    comprobante_transferencia = models.FileField(upload_to='comprobantes/', blank=True, null=True, help_text="Solo para pagos informados por transferencia")
+    comprobante_transferencia = CloudinaryField(
+        'comprobante',
+        blank=True,
+        null=True,
+        help_text="Solo para pagos informados por transferencia"
+    )
 
     id_pago_usuario = models.PositiveIntegerField(editable=False)
     id_pago_mercadopago = models.CharField(max_length=50, blank=True, null=True, help_text="ID de MercadoPago")

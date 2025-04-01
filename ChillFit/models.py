@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
 import uuid
+import re  
 
 
 class UsuarioManager(BaseUserManager):
@@ -70,6 +71,7 @@ class PlanDeTrabajo(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class Ejercicio(models.Model):
     descripcion = models.CharField(max_length=200)
     video = models.URLField(blank=True, null=True)
@@ -77,10 +79,17 @@ class Ejercicio(models.Model):
     def __str__(self):
         return self.descripcion
 
+    def clean(self):
+        if self.video and 'shorts/' in self.video:
+            match = re.search(r'shorts/([a-zA-Z0-9_-]{11})', self.video)
+            if match:
+                video_id = match.group(1)
+                self.video = f"https://www.youtube.com/watch?v={video_id}"
+
     @property
     def video_id(self):
         if self.video and "youtube" in self.video:
-            return self.video.split("v=")[-1].split("&")[0]  # Maneja ?v=ID y otros params
+            return self.video.split("v=")[-1].split("&")[0]
         elif "youtu.be/" in self.video:
             return self.video.split("youtu.be/")[-1].split("?")[0]
         return None

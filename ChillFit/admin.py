@@ -60,7 +60,7 @@ admin.site.register(Bloque, BloqueAdmin)
 
 # Configuración para el modelo Rutina
 class RutinaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion')
+    list_display = ('nombre', 'descripcion', 'incluir_tabata')
     search_fields = ('nombre', 'descripcion')
     list_filter = ()
     ordering = ('nombre',)

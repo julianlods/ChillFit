@@ -132,6 +132,7 @@ class Rutina(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)  # Campo agregado
     bloques = models.ManyToManyField(Bloque, blank=True)
+    incluir_tabata = models.BooleanField(default=True, help_text="¿Mostrar temporizador Tabata en esta rutina?")
 
     def __str__(self):
         return self.nombre

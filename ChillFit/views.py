@@ -170,10 +170,7 @@ def ver_rutina_detalle(request, rutina_id):
         bloques_lista.append(bloque)
 
     return render(request, 'ChillFit/rutinas/ver_rutina_detalle.html', {
-        'rutina': {
-            'id': rutina.id,
-            'bloques': bloques_lista
-        },
+        'rutina': rutina,  # ← pasás el objeto original
         'usuario_rutina': usuario_rutina,
         'fecha_hoy': now().date()
     })

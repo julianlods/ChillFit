@@ -94,8 +94,8 @@
     
         /* TABATA - CÍRCULO */
         .circle-timer {
-            width: 100%;
-            height: 100%;
+            width: 65%;
+            height: 65%;
             transform: rotate(-90deg); /* Esto inicia el trazo desde arriba (como debe ser) */
             transform-origin: 50% 50%;
         }
@@ -322,7 +322,7 @@
               if (ronda > rondas) {
                 clearInterval(temporizador);
                 temporizador = null;
-                estado.textContent = "¡Tabata Finalizado!";
+                estado.textContent = "¡Tabata finalizado!";
                 document.getElementById("start_global").disabled = true;
                 document.getElementById("pause_global").disabled = true;
                 return;
@@ -341,22 +341,36 @@
         }
 
         document.getElementById("start_global").addEventListener("click", () => {
-            const trabajoInput = parseInt(document.getElementById("trabajo_global").value);
-            const rondasInput = parseInt(document.getElementById("rondas_global").value);
-            const timerVisible = document.getElementById("tabata_global_timer").style.display !== 'none';
+            trabajo = parseInt(document.getElementById("trabajo_global").value);
+            descanso = parseInt(document.getElementById("descanso_global").value) || 0;
+            preparacion = parseInt(document.getElementById("preparacion_global").value) || 0;
+            rondas = parseInt(document.getElementById("rondas_global").value);
 
             if (
-                isNaN(trabajoInput) || isNaN(rondasInput) ||
-                trabajoInput <= 0 || rondasInput <= 0 ||
-                !timerVisible
+                isNaN(trabajo) || trabajo <= 0 ||
+                isNaN(rondas) || rondas <= 0
             ) {
                 Swal.fire({
                     icon: "warning",
                     title: "Tabata no configurado",
-                    text: "Por favor, configurá los valores antes de iniciar el Tabata."
+                    text: "Completá el tiempo de trabajo y la cantidad de rondas para iniciar."
                 });
                 return;
             }
+
+            ronda = 1;
+            enTrabajo = true;
+            enPreparacion = preparacion > 0;
+            pausado = false;
+            tiempoRestante = preparacion > 0 ? preparacion : trabajo;
+            duracionActual = tiempoRestante;
+
+            document.getElementById("tabata_global_timer").style.display = 'flex';
+            document.getElementById("estado_global").textContent = enPreparacion ? "Preparación" : "Trabajo";
+            document.getElementById("ronda_global").textContent = `Ronda: ${enPreparacion ? 0 : 1} / ${rondas}`;
+            document.getElementById("temporizador_global").textContent = "00:00";
+
+            actualizarReloj(1);
 
             if (!temporizador) {
                 temporizador = setInterval(tick, 1000);
@@ -375,13 +389,39 @@
         });
         
         function reiniciarTabataGlobal() {
-          clearInterval(temporizador);
-          temporizador = null;
-          document.getElementById("tabata_global_timer").style.display = 'none';
-          document.getElementById("preparacion_global").value = 0;
-          document.getElementById("trabajo_global").value = 0;
-          document.getElementById("descanso_global").value = 0;
-          document.getElementById("rondas_global").value = 0;
+            clearInterval(temporizador);
+            temporizador = null;
+            pausa = false;
+
+            // Reset variables
+            trabajo = 0;
+            descanso = 0;
+            preparacion = 0;
+            rondas = 0;
+            ronda = 1;
+            tiempoRestante = 0;
+            duracionActual = 0;
+            enTrabajo = true;
+            enPreparacion = true;
+
+            // Limpiar inputs
+            document.getElementById("preparacion_global").value = 0;
+            document.getElementById("trabajo_global").value = 0;
+            document.getElementById("descanso_global").value = 0;
+            document.getElementById("rondas_global").value = 0;
+
+            // Reset textos
+            document.getElementById("estado_global").textContent = "Preparación";
+            document.getElementById("ronda_global").textContent = "Ronda: 0 / 0";
+            document.getElementById("temporizador_global").textContent = "00:00";
+
+            // Reset visual del círculo
+            actualizarReloj(0); // sin progreso
+
+            // Deja el timer visible y botones en estado inicial
+            document.getElementById("tabata_global_timer").style.display = 'flex';
+            document.getElementById("start_global").disabled = false;
+            document.getElementById("pause_global").disabled = true;
         }
             
         </script>                

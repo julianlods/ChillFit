@@ -75,6 +75,56 @@
             </div>
         {% endfor %}
     </div>
+
+    <hr>
+    <div class="card shadow-sm mt-4 p-4">
+      <h4 class="mb-3">Temporizador Tabata</h4>
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label>Preparación (segundos):</label>
+          <input type="number" class="form-control" id="preparacion_global" value="5">
+        </div>
+        <div class="col-md-3">
+          <label>Trabajo (segundos):</label>
+          <input type="number" class="form-control" id="trabajo_global" value="20">
+        </div>
+        <div class="col-md-3">
+          <label>Descanso (segundos):</label>
+          <input type="number" class="form-control" id="descanso_global" value="10">
+        </div>
+        <div class="col-md-3">
+          <label>Rondas:</label>
+          <input type="number" class="form-control" id="rondas_global" value="8">
+        </div>
+      </div>
+
+      <button class="btn btn-outline-primary mb-4" onclick="configurarTabataGlobal()">▶️ Empezar Tabata</button>
+
+      <div id="tabata_global_timer" class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-4 py-3" style="display: none;">
+
+        <!-- Izquierda centrada -->
+        <div class="tabata-controls">
+          <h5 id="estado_global">Preparado</h5>
+          <h3 id="temporizador_global">00:00</h3>
+          <p id="ronda_global">Ronda: 0</p>
+          <div>
+            <button id="start_global" class="btn btn-success btn-sm">Iniciar</button>
+            <button id="pause_global" class="btn btn-warning btn-sm" disabled>Pausar</button>
+            <button onclick="reiniciarTabataGlobal()" class="btn btn-secondary btn-sm">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Derecha: Reloj circular -->
+        <div class="circle-timer-container">
+          <svg class="circle-timer" viewBox="0 0 100 100">
+            <circle class="bg" cx="50" cy="50" r="45" />
+            <circle class="progress" cx="50" cy="50" r="45" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
 </div>
 {% endblock %}
+
 

@@ -18,15 +18,15 @@
             display: flex;
             flex-direction: column;
         }
-
+    
         body {
             padding-top: 140px;
         }
-
+    
         main {
             flex: 1;
         }
-
+    
         .fixed-header {
             position: fixed;
             top: 0;
@@ -36,7 +36,7 @@
             background-color: #1b191a;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         }
-
+    
         .footer {
             background-color: #090d13;
             color: white;
@@ -47,22 +47,82 @@
             width: 100%;
             margin-top: auto;
         }
-
+    
         .footer a {
             color: #ffffff;
             text-decoration: none;
             margin: 0 5px;
         }
-
+    
         .footer a:hover {
             text-decoration: underline;
         }
-
+    
         .footer-links {
             margin-top: 5px;
             font-size: 13px;
         }
-    </style>
+    
+        /* TABATA - CONTENEDOR */
+        #tabata_global_timer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem 0;
+            text-align: center;
+        }
+    
+        .tabata-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    
+        #tabata_global_timer h5,
+        #tabata_global_timer h3,
+        #tabata_global_timer p {
+            margin-bottom: 0.4rem;
+        }
+    
+        #tabata_global_timer button {
+            margin: 0.25rem;
+        }
+    
+        /* TABATA - CÍRCULO */
+        .circle-timer {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Esto inicia el trazo desde arriba (como debe ser) */
+            transform-origin: 50% 50%;
+        }
+    
+        .circle-timer {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg) scaleX(-1); /* <-- reloj correcto */
+        }
+    
+        circle.bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 10;
+        }
+    
+        circle.progress {
+            fill: none;
+            stroke: #007bff;
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 282.6;
+            stroke-dashoffset: 0;
+            transition: stroke 0.3s;
+        }
+    </style>     
+
 </head>
 <body>
     <header class="fixed-header">
@@ -168,6 +228,139 @@
         {% endfor %}
     </script>
     {% endif %}
+
+    <script>
+        let trabajo = 0, descanso = 0, preparacion = 0, rondas = 0;
+        let ronda = 1;
+        let tiempoRestante = 0;
+        let duracionActual = 0;
+        let enTrabajo = true;
+        let enPreparacion = true;
+        let temporizador = null;
+        let pausado = false;
+        
+        function configurarTabataGlobal() {
+          trabajo = parseInt(document.getElementById("trabajo_global").value);
+          descanso = parseInt(document.getElementById("descanso_global").value);
+          preparacion = parseInt(document.getElementById("preparacion_global").value);
+          rondas = parseInt(document.getElementById("rondas_global").value);
+        
+          if (isNaN(trabajo) || isNaN(descanso) || isNaN(preparacion) || isNaN(rondas)) {
+            alert("Por favor completá todos los campos con números válidos.");
+            return;
+          }
+        
+          ronda = 1;
+          enTrabajo = true;
+          enPreparacion = true;
+          pausado = false;
+          tiempoRestante = preparacion;
+          duracionActual = preparacion;
+        
+          document.getElementById("tabata_global_timer").style.display = 'flex';
+          document.getElementById("estado_global").textContent = "Preparación";
+          document.getElementById("ronda_global").textContent = `Ronda: 0 / ${rondas}`;
+          document.getElementById("temporizador_global").textContent = "00:00";
+        
+          actualizarReloj(1);
+        
+          document.getElementById("start_global").disabled = false;
+          document.getElementById("pause_global").disabled = true;
+        }
+        
+        function actualizarReloj(progresoManual = null) {
+          const progressCircle = document.querySelector("circle.progress");
+          const circunferencia = 2 * Math.PI * 45;
+          const progreso = progresoManual !== null
+            ? progresoManual
+            : tiempoRestante / duracionActual;
+          const offset = circunferencia * (1 - progreso);
+        
+          progressCircle.style.strokeDasharray = circunferencia;
+          progressCircle.style.strokeDashoffset = offset;
+        
+          if (!enPreparacion && enTrabajo && tiempoRestante <= 5) {
+            progressCircle.style.stroke = "red";
+          } else {
+            progressCircle.style.stroke = "#007bff";
+          }
+        }
+        
+        function actualizarTexto() {
+          const tiempo = document.getElementById("temporizador_global");
+          let min = Math.floor(tiempoRestante / 60).toString().padStart(2, '0');
+          let seg = (tiempoRestante % 60).toString().padStart(2, '0');
+          tiempo.textContent = `${min}:${seg}`;
+        }
+        
+        function tick() {
+          if (tiempoRestante > 0) {
+            tiempoRestante--;
+            actualizarTexto();
+            actualizarReloj();
+          } else {
+            const estado = document.getElementById("estado_global");
+        
+            if (enPreparacion) {
+              enPreparacion = false;
+              tiempoRestante = trabajo;
+              duracionActual = trabajo;
+              estado.textContent = "Trabajo";
+            } else if (enTrabajo) {
+              enTrabajo = false;
+              tiempoRestante = descanso;
+              duracionActual = descanso;
+              estado.textContent = "Descanso";
+            } else {
+              if (!enPreparacion) {
+                ronda++;
+              }
+        
+              if (ronda > rondas) {
+                clearInterval(temporizador);
+                temporizador = null;
+                estado.textContent = "¡Tabata Finalizado!";
+                document.getElementById("start_global").disabled = true;
+                document.getElementById("pause_global").disabled = true;
+                return;
+              }
+        
+              enTrabajo = true;
+              tiempoRestante = trabajo;
+              duracionActual = trabajo;
+              estado.textContent = "Trabajo";
+            }
+        
+            document.getElementById("ronda_global").textContent = `Ronda: ${enPreparacion ? 0 : ronda} / ${rondas}`;
+            actualizarTexto();
+            actualizarReloj();
+          }
+        }
+        
+        document.getElementById("start_global").addEventListener("click", () => {
+          if (!temporizador) {
+            temporizador = setInterval(tick, 1000);
+            pausado = false;
+            document.getElementById("start_global").disabled = true;
+            document.getElementById("pause_global").disabled = false;
+          }
+        });
+        
+        document.getElementById("pause_global").addEventListener("click", () => {
+          clearInterval(temporizador);
+          temporizador = null;
+          pausado = true;
+          document.getElementById("start_global").disabled = false;
+          document.getElementById("pause_global").disabled = true;
+        });
+        
+        function reiniciarTabataGlobal() {
+          clearInterval(temporizador);
+          temporizador = null;
+          document.getElementById("tabata_global_timer").style.display = 'none';
+        }
+        </script>                
+
 </body>
 </html>
 

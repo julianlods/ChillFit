@@ -1,9 +1,9 @@
 {% extends 'ChillFit/base.html' %}
 
 {% block content %}
-<div class="container mt-3 text-center"> <!-- Centrar contenido -->
+<div class="container mt-3 text-center">
 
-    <div class="card shadow-sm p-3 mb-4"> <!-- Caja con sombra y padding -->
+    <div class="card shadow-sm p-3 mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <h4 class="mb-2 mb-md-0">
                 <strong>Estado de Rutina {{ rutina.id }}:</strong> 
@@ -16,7 +16,6 @@
 
             <form method="POST" class="d-flex align-items-center">
                 {% csrf_token %}
-                
                 {% if usuario_rutina.realizada %}
                     <input type="hidden" name="desmarcar" value="true">
                     <button type="submit" class="btn btn-warning btn-sm ms-2 px-4 py-2">
@@ -40,9 +39,10 @@
         </div>
     </div>
 
-    <div class="row justify-content-center"> <!-- Centrar las tarjetas -->
+    <!-- BLOQUES EN MASONRY -->
+    <div class="masonry-container" style="column-count: 3; column-gap: 1rem;">
         {% for bloque in rutina.bloques.all %}
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="mb-4" style="break-inside: avoid;">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h4 class="mb-0">{{ bloque.nombre }}</h4>
@@ -57,7 +57,6 @@
                             {% for relacion in bloque.bloqueejercicio_set.all|dictsort:"orden" %}
                                 <li class="list-group-item">
                                     <strong>{{ relacion.ejercicio.descripcion }}</strong>
-
                                     {% if relacion.ejercicio.video_id %}
                                         <br>
                                         <div class="ratio ratio-16x9 mt-2">
@@ -75,58 +74,57 @@
             </div>
         {% endfor %}
     </div>
+    <!-- FIN BLOQUES -->
 
     {% if rutina.incluir_tabata %}
         <hr>
         <div class="card shadow-sm mt-4 p-4">
-        <h4 class="mb-3">Temporizador Tabata</h4>
-        <div class="row mb-3">
-            <div class="col-md-3">
-            <label>Preparación (segundos):</label>
-            <input type="number" class="form-control" id="preparacion_global" value="0">
-            </div>
-            <div class="col-md-3">
-            <label>Trabajo (segundos):</label>
-            <input type="number" class="form-control" id="trabajo_global" value="0">
-            </div>
-            <div class="col-md-3">
-            <label>Descanso (segundos):</label>
-            <input type="number" class="form-control" id="descanso_global" value="0">
-            </div>
-            <div class="col-md-3">
-            <label>Rondas:</label>
-            <input type="number" class="form-control" id="rondas_global" value="0">
-            </div>
-        </div>
-
-        <button class="btn btn-outline-primary mb-4" onclick="configurarTabataGlobal()">⚙️ Configurar Tabata</button>
-
-        <div id="tabata_global_timer" class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-4 py-3" style="display: none;">
-
-            <!-- Izquierda centrada -->
-            <div class="tabata-controls">
-            <h5 id="estado_global">Preparado</h5>
-            <h3 id="temporizador_global">00:00</h3>
-            <p id="ronda_global">Ronda: 0</p>
-            <div>
-                <button id="start_global" class="btn btn-success btn-sm">Iniciar</button>
-                <button id="pause_global" class="btn btn-warning btn-sm" disabled>Pausar</button>
-                <button onclick="reiniciarTabataGlobal()" class="btn btn-secondary btn-sm">Reiniciar</button>
-            </div>
+            <h4 class="mb-3">Temporizador Tabata</h4>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>Preparación (segundos):</label>
+                    <input type="number" class="form-control" id="preparacion_global" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label>Trabajo (segundos):</label>
+                    <input type="number" class="form-control" id="trabajo_global" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label>Descanso (segundos):</label>
+                    <input type="number" class="form-control" id="descanso_global" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label>Rondas:</label>
+                    <input type="number" class="form-control" id="rondas_global" value="0">
+                </div>
             </div>
 
-            <!-- Derecha: Reloj circular -->
-            <div class="circle-timer-container">
-            <svg class="circle-timer" viewBox="0 0 100 100">
-                <circle class="bg" cx="50" cy="50" r="45" />
-                <circle class="progress" cx="50" cy="50" r="45" />
-            </svg>
+            <button class="btn btn-outline-primary mb-4" onclick="configurarTabataGlobal()">⚙️ Configurar Tabata</button>
+
+            <div id="tabata_global_timer" class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-4 py-3" style="display: none;">
+                <div class="tabata-controls">
+                    <h5 id="estado_global">Preparado</h5>
+                    <h3 id="temporizador_global">00:00</h3>
+                    <p id="ronda_global">Ronda: 0</p>
+                    <div>
+                        <button id="start_global" class="btn btn-success btn-sm">Iniciar</button>
+                        <button id="pause_global" class="btn btn-warning btn-sm" disabled>Pausar</button>
+                        <button onclick="reiniciarTabataGlobal()" class="btn btn-secondary btn-sm">Reiniciar</button>
+                    </div>
+                </div>
+
+                <div class="circle-timer-container">
+                    <svg class="circle-timer" viewBox="0 0 100 100">
+                        <circle class="bg" cx="50" cy="50" r="45" />
+                        <circle class="progress" cx="50" cy="50" r="45" />
+                    </svg>
+                </div>
             </div>
-        </div>
         </div>
     {% endif %}
 
 </div>
 {% endblock %}
+
 
 

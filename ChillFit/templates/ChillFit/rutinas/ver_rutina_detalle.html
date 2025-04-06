@@ -39,10 +39,10 @@
         </div>
     </div>
 
-    <!-- BLOQUES EN MASONRY -->
-    <div class="masonry-container" style="column-count: 3; column-gap: 1rem;">
+    <!-- BLOQUES EN GRILLA NORMAL -->
+    <div class="row justify-content-center">
         {% for bloque in rutina.bloques.all %}
-            <div class="mb-4" style="break-inside: avoid;">
+            <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h4 class="mb-0">{{ bloque.nombre }}</h4>
@@ -125,6 +125,7 @@
 
 </div>
 {% endblock %}
+
 
 
 

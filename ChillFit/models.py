@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Group, Permission
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
 import uuid
@@ -12,8 +13,10 @@ class UsuarioManager(BaseUserManager):
         if not email:
             raise ValueError("El email es obligatorio")
         email = self.normalize_email(email)
+        username = username.lower()
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
+        user.full_clean()
         user.save(using=self._db)
         return user
 
@@ -38,6 +41,21 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    def clean(self):
+        super().clean()
+        UsuarioModel = type(self)
+        if UsuarioModel.objects.exclude(pk=self.pk).filter(email__iexact=self.email).exists():
+            raise ValidationError({'email': "Ya existe un usuario con este email."})
+        if UsuarioModel.objects.exclude(pk=self.pk).filter(username__iexact=self.username).exists():
+            raise ValidationError({'username': "Ya existe un usuario con este nombre de usuario."})
+    
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = self.email.lower()
+        if self.username:
+            self.username = self.username.lower()
+        super().save(*args, **kwargs)
 
 class PerfilUsuario(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil')

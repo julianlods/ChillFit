@@ -226,148 +226,165 @@
     {% endif %}
 
     <script>
-        let trabajo = 0, descanso = 0, preparacion = 0, rondas = 0;
-        let ronda = 1;
+        let trabajo = 0, descanso = 0, preparacion = 0, rondas = 0, ejercicios = 1;
+        let ronda = 1, ejercicioActual = 1;
         let tiempoRestante = 0;
         let duracionActual = 0;
         let enTrabajo = true;
         let enPreparacion = true;
         let temporizador = null;
         let pausado = false;
-        
-        function configurarTabataGlobal() {
-          trabajo = parseInt(document.getElementById("trabajo_global").value);
-          descanso = parseInt(document.getElementById("descanso_global").value);
-          preparacion = parseInt(document.getElementById("preparacion_global").value);
-          rondas = parseInt(document.getElementById("rondas_global").value);
-        
-          if (
-            isNaN(trabajo) || isNaN(descanso) || isNaN(preparacion) || isNaN(rondas) ||
-            trabajo === 0 || rondas === 0
-            ) {
-            Swal.fire({
-                icon: "error",
-                title: "Configuración inválida",
-                text: "Configurá el tiempo de trabajo y la cantidad de rondas antes de comenzar."
-            });
-            return;
-          }
-       
-          ronda = 1;
-          enTrabajo = true;
-          enPreparacion = true;
-          pausado = false;
-          tiempoRestante = preparacion;
-          duracionActual = preparacion;
-        
-          document.getElementById("tabata_global_timer").style.display = 'flex';
-          document.getElementById("estado_global").textContent = "Preparación";
-          document.getElementById("ronda_global").textContent = `Ronda: 0 / ${rondas}`;
-          document.getElementById("temporizador_global").textContent = "00:00";
-        
-          actualizarReloj(1);
-        
-          document.getElementById("start_global").disabled = false;
-          document.getElementById("pause_global").disabled = true;
-        }
-        
-        function actualizarReloj(progresoManual = null) {
-          const progressCircle = document.querySelector("circle.progress");
-          const circunferencia = 2 * Math.PI * 45;
-          const progreso = progresoManual !== null
-            ? progresoManual
-            : tiempoRestante / duracionActual;
-          const offset = circunferencia * (1 - progreso);
-        
-          progressCircle.style.strokeDasharray = circunferencia;
-          progressCircle.style.strokeDashoffset = offset;
-        
-          if (!enPreparacion && enTrabajo && tiempoRestante <= 5) {
-            progressCircle.style.stroke = "red";
-          } else {
-            progressCircle.style.stroke = "#007bff";
-          }
-        }
-        
-        function actualizarTexto() {
-          const tiempo = document.getElementById("temporizador_global");
-          let min = Math.floor(tiempoRestante / 60).toString().padStart(2, '0');
-          let seg = (tiempoRestante % 60).toString().padStart(2, '0');
-          tiempo.textContent = `${min}:${seg}`;
-        }
-        
-        function tick() {
-          if (tiempoRestante > 0) {
-            tiempoRestante--;
-            actualizarTexto();
-            actualizarReloj();
-          } else {
-            const estado = document.getElementById("estado_global");
-        
-            if (enPreparacion) {
-              enPreparacion = false;
-              tiempoRestante = trabajo;
-              duracionActual = trabajo;
-              estado.textContent = "Trabajo";
-            } else if (enTrabajo) {
-              enTrabajo = false;
-              tiempoRestante = descanso;
-              duracionActual = descanso;
-              estado.textContent = "Descanso";
-            } else {
-              if (!enPreparacion) {
-                ronda++;
-              }
-        
-              if (ronda > rondas) {
-                clearInterval(temporizador);
-                temporizador = null;
-                estado.textContent = "¡Tabata finalizado!";
-                document.getElementById("start_global").disabled = true;
-                document.getElementById("pause_global").disabled = true;
-                return;
-              }
-        
-              enTrabajo = true;
-              tiempoRestante = trabajo;
-              duracionActual = trabajo;
-              estado.textContent = "Trabajo";
-            }
-        
-            document.getElementById("ronda_global").textContent = `Ronda: ${enPreparacion ? 0 : ronda} / ${rondas}`;
-            actualizarTexto();
-            actualizarReloj();
-          }
-        }
 
-        document.getElementById("start_global").addEventListener("click", () => {
+        function configurarTabataGlobal() {
             trabajo = parseInt(document.getElementById("trabajo_global").value);
-            descanso = parseInt(document.getElementById("descanso_global").value) || 0;
-            preparacion = parseInt(document.getElementById("preparacion_global").value) || 0;
+            descanso = parseInt(document.getElementById("descanso_global").value);
+            preparacion = parseInt(document.getElementById("preparacion_global").value);
             rondas = parseInt(document.getElementById("rondas_global").value);
+            ejercicios = parseInt(document.getElementById("ejercicios_global").value);
 
             if (
                 isNaN(trabajo) || trabajo <= 0 ||
-                isNaN(rondas) || rondas <= 0
+                isNaN(rondas) || rondas <= 0 ||
+                isNaN(ejercicios) || ejercicios <= 0
             ) {
                 Swal.fire({
-                    icon: "warning",
-                    title: "Tabata no configurado",
-                    text: "Completá el tiempo de trabajo y la cantidad de rondas para iniciar."
+                    icon: "error",
+                    title: "Configuración inválida",
+                    text: "Completá tiempo de trabajo, cantidad de ejercicios y rondas antes de comenzar."
                 });
                 return;
             }
 
             ronda = 1;
+            ejercicioActual = 1;
+            enTrabajo = true;
+            enPreparacion = true;
+            pausado = false;
+            tiempoRestante = preparacion;
+            duracionActual = preparacion;
+
+            document.getElementById("tabata_global_timer").style.display = 'flex';
+            document.getElementById("estado_global").textContent = "Preparación";
+            document.getElementById("ronda_global").textContent = `Ejercicio: ${ejercicioActual} / ${ejercicios} | Ronda: ${enPreparacion ? 0 : ronda} / ${rondas}`;
+            document.getElementById("temporizador_global").textContent = "00:00";
+
+            actualizarReloj(1);
+
+            document.getElementById("start_global").disabled = false;
+            document.getElementById("pause_global").disabled = true;
+        }
+
+        function actualizarReloj(progresoManual = null) {
+            const progressCircle = document.querySelector("circle.progress");
+            const circunferencia = 2 * Math.PI * 45;
+            const progreso = progresoManual !== null
+                ? progresoManual
+                : tiempoRestante / duracionActual;
+            const offset = circunferencia * (1 - progreso);
+
+            progressCircle.style.strokeDasharray = circunferencia;
+            progressCircle.style.strokeDashoffset = offset;
+
+            if (!enPreparacion && enTrabajo && tiempoRestante <= 5) {
+                progressCircle.style.stroke = "red";
+            } else {
+                progressCircle.style.stroke = "#007bff";
+            }
+        }
+
+        function actualizarTexto() {
+            const tiempo = document.getElementById("temporizador_global");
+            let min = Math.floor(tiempoRestante / 60).toString().padStart(2, '0');
+            let seg = (tiempoRestante % 60).toString().padStart(2, '0');
+            tiempo.textContent = `${min}:${seg}`;
+        }
+
+        function tick() {
+            if (tiempoRestante > 0) {
+                tiempoRestante--;
+                actualizarTexto();
+                actualizarReloj();
+            } else {
+                const estado = document.getElementById("estado_global");
+
+                if (enPreparacion) {
+                    enPreparacion = false;
+                    tiempoRestante = trabajo;
+                    duracionActual = trabajo;
+                    estado.textContent = "Trabajo";
+                } else if (enTrabajo) {
+                    enTrabajo = false;
+                    tiempoRestante = descanso;
+                    duracionActual = descanso;
+                    estado.textContent = "Descanso";
+                } else {
+                    ejercicioActual++;
+
+                    if (ejercicioActual > ejercicios) {
+                        ejercicioActual = 1;
+                        ronda++;
+                    }
+
+                    if (ronda > rondas) {
+                        clearInterval(temporizador);
+                        temporizador = null;
+                        estado.textContent = "¡Tabata finalizado!";
+                        document.getElementById("start_global").disabled = true;
+                        document.getElementById("pause_global").disabled = true;
+                        return;
+                    }
+
+                    enTrabajo = true;
+                    tiempoRestante = trabajo;
+                    duracionActual = trabajo;
+                    estado.textContent = "Trabajo";
+                }
+
+                document.getElementById("ronda_global").textContent = `Ejercicio: ${ejercicioActual} / ${ejercicios} | Ronda: ${enPreparacion ? 0 : ronda} / ${rondas}`;
+                actualizarTexto();
+                actualizarReloj();
+            }
+        }
+
+        document.getElementById("start_global").addEventListener("click", () => {
+            if (pausado && tiempoRestante > 0) {
+                temporizador = setInterval(tick, 1000);
+                pausado = false;
+                document.getElementById("start_global").disabled = true;
+                document.getElementById("pause_global").disabled = false;
+                return;
+            }
+
+            trabajo = parseInt(document.getElementById("trabajo_global").value);
+            descanso = parseInt(document.getElementById("descanso_global").value) || 0;
+            preparacion = parseInt(document.getElementById("preparacion_global").value) || 0;
+            rondas = parseInt(document.getElementById("rondas_global").value);
+            ejercicios = parseInt(document.getElementById("ejercicios_global").value);
+
+            if (
+                isNaN(trabajo) || trabajo <= 0 ||
+                isNaN(rondas) || rondas <= 0 ||
+                isNaN(ejercicios) || ejercicios <= 0
+            ) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Tabata no configurado",
+                    text: "Completá tiempo de trabajo, cantidad de ejercicios y rondas antes de comenzar."
+                });
+                return;
+            }
+
+            ronda = 1;
+            ejercicioActual = 1;
             enTrabajo = true;
             enPreparacion = preparacion > 0;
             pausado = false;
-            tiempoRestante = preparacion > 0 ? preparacion : trabajo;
+            tiempoRestante = enPreparacion ? preparacion : trabajo;
             duracionActual = tiempoRestante;
 
             document.getElementById("tabata_global_timer").style.display = 'flex';
             document.getElementById("estado_global").textContent = enPreparacion ? "Preparación" : "Trabajo";
-            document.getElementById("ronda_global").textContent = `Ronda: ${enPreparacion ? 0 : 1} / ${rondas}`;
+            document.getElementById("ronda_global").textContent = `Ejercicio: 1 / ${ejercicios} | Ronda: ${enPreparacion ? 0 : 1} / ${rondas}`;
             document.getElementById("temporizador_global").textContent = "00:00";
 
             actualizarReloj(1);
@@ -381,50 +398,49 @@
         });
 
         document.getElementById("pause_global").addEventListener("click", () => {
-          clearInterval(temporizador);
-          temporizador = null;
-          pausado = true;
-          document.getElementById("start_global").disabled = false;
-          document.getElementById("pause_global").disabled = true;
+            clearInterval(temporizador);
+            temporizador = null;
+            pausado = true;
+            document.getElementById("start_global").disabled = false;
+            document.getElementById("pause_global").disabled = true;
         });
-        
+
         function reiniciarTabataGlobal() {
             clearInterval(temporizador);
             temporizador = null;
-            pausa = false;
+            pausado = false;
 
-            // Reset variables
             trabajo = 0;
             descanso = 0;
             preparacion = 0;
             rondas = 0;
+            ejercicios = 1;
+            ejercicioActual = 1;
             ronda = 1;
             tiempoRestante = 0;
             duracionActual = 0;
             enTrabajo = true;
             enPreparacion = true;
 
-            // Limpiar inputs
             document.getElementById("preparacion_global").value = 0;
             document.getElementById("trabajo_global").value = 0;
             document.getElementById("descanso_global").value = 0;
             document.getElementById("rondas_global").value = 0;
+            document.getElementById("ejercicios_global").value = 1;
 
-            // Reset textos
             document.getElementById("estado_global").textContent = "Preparación";
-            document.getElementById("ronda_global").textContent = "Ronda: 0 / 0";
+            document.getElementById("ronda_global").textContent = "Ejercicio: 0 / 1 | Ronda: 0 / 0";
             document.getElementById("temporizador_global").textContent = "00:00";
 
-            // Reset visual del círculo
-            actualizarReloj(0); // sin progreso
-
-            // Deja el timer visible y botones en estado inicial
+            actualizarReloj(0);
             document.getElementById("tabata_global_timer").style.display = 'flex';
             document.getElementById("start_global").disabled = false;
             document.getElementById("pause_global").disabled = true;
         }
-            
-        </script>                
+    </script>
+
+
+
 
 </body>
 </html>

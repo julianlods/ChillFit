@@ -7,6 +7,7 @@ from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -69,20 +70,23 @@ def register_view(request):
         profile_form = PerfilUsuarioForm(request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.usuario = user
-            profile.save()
+            try:
+                user = user_form.save(commit=False)
+                user.full_clean()  # Ejecuta las validaciones del modelo (clean())
+                user.save()
 
-            # Dejamos solo la variable para SweetAlert
-            user_form = CustomUserCreationForm()
-            profile_form = PerfilUsuarioForm()
+                perfil = profile_form.save(commit=False)
+                perfil.usuario = user
+                perfil.save()
 
-            return render(request, 'ChillFit/register.html', {
-                'user_form': user_form,
-                'profile_form': profile_form,
-                'registro_exitoso': True  
-            })
+                return render(request, 'ChillFit/register.html', {
+                    'registro_exitoso': True
+                })
+
+            except ValidationError as e:
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        user_form.add_error(field, error)
 
     else:
         user_form = CustomUserCreationForm()

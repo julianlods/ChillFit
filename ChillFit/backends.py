@@ -2,29 +2,29 @@
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 class UsuarioEmailBackend(BaseBackend):
     """
     Backend de autenticación personalizado que permite el login
     utilizando el email o el username junto con la contraseña.
+    Ahora también insensible a mayúsculas.
     """
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         try:
-            # Buscar al usuario por email o username
-            if '@' in username:
-                users = UserModel.objects.filter(email=username)
-            else:
-                users = UserModel.objects.filter(username=username)
+            # Insensible a mayúsculas
+            users = UserModel.objects.filter(
+                Q(email__iexact=username) | Q(username__iexact=username)
+            )
 
             if users.count() == 1:
                 user = users.first()
             else:
-                return None  # Maneja el caso de múltiples usuarios o ninguno encontrado
+                return None
         except UserModel.DoesNotExist:
             return None
 
-        # Verificar la contraseña
         if user.check_password(password):
             return user
 
@@ -36,3 +36,4 @@ class UsuarioEmailBackend(BaseBackend):
             return UserModel.objects.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
+

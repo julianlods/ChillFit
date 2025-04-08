@@ -1,12 +1,14 @@
 {% extends 'ChillFit/base.html' %}
 
+{% block title %}Rutina: {{ rutina.nombre }} | ChillFit{% endblock %}
+
 {% block content %}
 <div class="container mt-3 text-center">
 
     <div class="card shadow-sm p-3 mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <h4 class="mb-2 mb-md-0">
-                <strong>Estado de Rutina {{ rutina.id }}:</strong> 
+                <strong>Estado de Rutina {{ rutina.nombre }}:</strong> 
                 {% if usuario_rutina.realizada %}
                     <span class="badge bg-success px-3 py-2">Realizada</span>
                 {% else %}
@@ -81,17 +83,21 @@
         <div class="card shadow-sm mt-4 p-4">
             <h4 class="mb-3">Temporizador Tabata</h4>
             <div class="row mb-3">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>Preparación (segundos):</label>
                     <input type="number" class="form-control" id="preparacion_global" value="0">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>Trabajo (segundos):</label>
                     <input type="number" class="form-control" id="trabajo_global" value="0">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>Descanso (segundos):</label>
                     <input type="number" class="form-control" id="descanso_global" value="0">
+                </div>
+                <div class="col-md-3">
+                    <label>Cantidad de ejercicios:</label>
+                    <input type="number" class="form-control" id="ejercicios_global" value="1">
                 </div>
                 <div class="col-md-3">
                     <label>Rondas:</label>

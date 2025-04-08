@@ -1,6 +1,6 @@
 {% extends 'ChillFit/base.html' %}
 
-{% block title %}Rutina: {{ rutina.nombre }} | ChillFit{% endblock %}
+{% block title %}{{ rutina.nombre }} | ChillFit{% endblock %}
 
 {% block content %}
 <div class="container mt-3 text-center">
@@ -8,7 +8,7 @@
     <div class="card shadow-sm p-3 mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
             <h4 class="mb-2 mb-md-0">
-                <strong>Estado de Rutina {{ rutina.nombre }}:</strong> 
+                <strong>Estado - {{ rutina.nombre }}:</strong> 
                 {% if usuario_rutina.realizada %}
                     <span class="badge bg-success px-3 py-2">Realizada</span>
                 {% else %}

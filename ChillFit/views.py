@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from django.conf import settings
 
-from .models import UsuarioRutina, Rutina, PerfilUsuario, PlanDeTrabajo, Pago, BloqueEjercicio
+from .models import UsuarioRutina, Rutina, PerfilUsuario, PlanDeTrabajo, Pago, BloqueEjercicio, Profesor
 from .forms import CustomUserCreationForm, PerfilUsuarioForm
 
 
@@ -65,6 +65,8 @@ def login_view(request):
 
 
 def register_view(request):
+    profesores = Profesor.objects.all()
+
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
         profile_form = PerfilUsuarioForm(request.POST)
@@ -72,11 +74,20 @@ def register_view(request):
         if user_form.is_valid() and profile_form.is_valid():
             try:
                 user = user_form.save(commit=False)
-                user.full_clean()  # Ejecuta las validaciones del modelo (clean())
+                user.es_profesor = bool(request.POST.get('es_profesor'))
+                user.full_clean()
                 user.save()
 
                 perfil = profile_form.save(commit=False)
                 perfil.usuario = user
+
+                if not user.es_profesor:
+                    profesor_id = request.POST.get('profesor_id')
+                    if profesor_id:
+                        perfil.profesor_id = profesor_id
+                else:
+                    Profesor.objects.create(usuario=user, nombre_completo=user.username)
+
                 perfil.save()
 
                 return render(request, 'ChillFit/register.html', {
@@ -94,7 +105,8 @@ def register_view(request):
 
     return render(request, 'ChillFit/register.html', {
         'user_form': user_form,
-        'profile_form': profile_form
+        'profile_form': profile_form,
+        'profesores': profesores
     })
 
 
@@ -239,6 +251,12 @@ def perfil(request):
         if plan_id:
             perfil.plan_de_trabajo = PlanDeTrabajo.objects.get(id=plan_id)
 
+        # Solo permitir elegir profesor si aún no fue asignado
+        if not perfil.profesor:
+            profesor_id = request.POST.get('profesor')
+            if profesor_id:
+                perfil.profesor_id = profesor_id
+
         perfil.save()
 
         # CAMBIO DE CONTRASEÑA (si se completan los campos)
@@ -259,10 +277,12 @@ def perfil(request):
         return redirect('perfil')
 
     planes = PlanDeTrabajo.objects.all()  # Obtener todos los planes
+    profesores = Profesor.objects.all()
 
     return render(request, 'ChillFit/perfil.html', {
         'perfil': perfil,
-        'planes': planes
+        'planes': planes,
+        'profesores': profesores
     })
 
 

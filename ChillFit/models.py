@@ -30,6 +30,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    es_profesor = models.BooleanField(default=False)  
 
     groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)
@@ -62,6 +63,7 @@ class PerfilUsuario(models.Model):
     telefono = models.CharField(max_length=20, blank=True, null=True)
     edad = models.PositiveIntegerField(blank=False, null=False, default=18)
     avatar = CloudinaryField('avatar', blank=True, null=True)
+    profesor = models.ForeignKey('Profesor', on_delete=models.SET_NULL, null=True, blank=True, related_name='alumnos')
 
     sexo = models.CharField(
         max_length=10,
@@ -213,4 +215,12 @@ class Pago(models.Model):
     def __str__(self):
         metodo = self.get_metodo_pago_display() if self.metodo_pago else "Sin método"
         return f"Pago {self.id_pago_usuario} - {self.usuario.username} - ${self.monto} - {self.get_estado_display()} ({metodo})"
+
+
+class Profesor(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='profesor')
+    nombre_completo = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nombre_completo
 

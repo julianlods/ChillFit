@@ -94,11 +94,37 @@
                 </div>
             </div>
 
-            <!-- Avatar -->
-            <div class="mb-2">
-                <label for="id_avatar">Avatar</label>
-                <input type="file" class="form-control" name="avatar" id="id_avatar">
+            <!-- Avatar y Profesor en una misma fila -->
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label for="id_avatar">Avatar</label>
+                    <input type="file" class="form-control" name="avatar" id="id_avatar">
+                </div>
+
+                <div class="col-6 mb-2">
+                    {% if not perfil.profesor %}
+                        <label for="id_profesor">Seleccioná tu Profesor</label>
+                        <select class="form-select" name="profesor" id="id_profesor">
+                            <option value="">---------</option>
+                            {% for profe in profesores %}
+                                <option value="{{ profe.id }}">{{ profe.nombre_completo }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <label>Profesor Asignado</label>
+                        <input type="text" class="form-control" value="{{ perfil.profesor.nombre_completo }}" disabled>
+                    {% endif %}
+                </div>
             </div>
+
+            <!-- Mensaje informativo si ya tiene profesor -->
+            {% if perfil.profesor %}
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <small class="text-muted">Importante: Para modificar al profesor contactá al administrador del sitio.</small>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Botón -->
             <div class="text-center mt-3">

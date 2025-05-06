@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.utils import timezone
-from .models import Usuario, PerfilUsuario, PlanDeTrabajo, Ejercicio, Bloque, Rutina, MetodoDeTrabajo, UsuarioRutina, Pago, BloqueEjercicio
+from .models import Usuario, PerfilUsuario, PlanDeTrabajo, Ejercicio, Bloque, Rutina, MetodoDeTrabajo, UsuarioRutina, Pago, BloqueEjercicio, Profesor
 from .forms import UsuarioRutinaForm, BloqueEjercicioForm
 from django.utils.html import format_html
 
@@ -144,3 +144,11 @@ class PagoAdmin(admin.ModelAdmin):
     marcar_como_rechazado.short_description = "Marcar pagos como Rechazados"
 
 admin.site.register(Pago, PagoAdmin)
+
+
+class ProfesorAdmin(admin.ModelAdmin):
+    list_display = ('nombre_completo', 'usuario')
+    search_fields = ('nombre_completo', 'usuario__email', 'usuario__username')
+
+admin.site.register(Profesor, ProfesorAdmin)
+

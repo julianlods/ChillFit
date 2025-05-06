@@ -17,9 +17,16 @@ admin.site.register(Usuario, UsuarioAdmin)
 
 # Configuración para el modelo PerfilUsuario
 class PerfilUsuarioAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'telefono', 'edad', 'sexo', 'plan_de_trabajo')
+    list_display = ('usuario', 'telefono', 'edad', 'sexo', 'plan_de_trabajo', 'mostrar_profesor')
     search_fields = ('usuario__email', 'usuario__username')
-    list_filter = ('sexo', 'plan_de_trabajo')
+    list_filter = ('sexo', 'plan_de_trabajo', 'profesor')
+
+    def mostrar_profesor(self, obj):
+        if obj.profesor:
+            return obj.profesor.nombre_completo
+        return "Sin profesor"
+
+    mostrar_profesor.short_description = 'Profesor'
 
 admin.site.register(PerfilUsuario, PerfilUsuarioAdmin)
 
